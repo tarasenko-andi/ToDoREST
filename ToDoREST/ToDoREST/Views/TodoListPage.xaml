@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ToDoREST.Views.TodoListPage"
+             xmlns:constans="clr-namespace:ToDoREST">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="+" Clicked="OnAddItemClicked">
+            <ToolbarItem.IconImageSource>
+                <OnPlatform x:TypeArguments="ImageSource">
+                    <On Platform="Android, UWP" Value="plus.png" />
+                </OnPlatform>
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Frame Grid.Row="0" BackgroundColor="LightCoral" HasShadow="True" Margin="10">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="5*"/>
+                        <ColumnDefinition Width="10*"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Text="Имья" Grid.Column="0">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ChangeSortedTypeCommand}" CommandParameter="1"/>
+                        </Label.GestureRecognizers>
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label" Binding="{Binding ChangeState}" Value="10">
+                                <Setter Property="Text" Value="Имья ↓"/>
+                            </DataTrigger>
+                            <DataTrigger TargetType="Label" Binding="{Binding ChangeState}" Value="11">
+                                <Setter Property="Text" Value="Имья ↑"/>
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                    <Label Text="E-mail" Grid.Column="1">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ChangeSortedTypeCommand}" CommandParameter="2"/>
+                        </Label.GestureRecognizers>
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label" Binding="{Binding ChangeState}" Value="20">
+                                <Setter Property="Text" Value="E-mail ↓"/>
+                            </DataTrigger>
+                            <DataTrigger TargetType="Label" Binding="{Binding ChangeState}" Value="21">
+                                <Setter Property="Text" Value="E-mail ↑"/>
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                    <Label Text="Задача" Grid.Column="2">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ChangeSortedTypeCommand}" CommandParameter="3"/>
+                        </Label.GestureRecognizers>
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label" Binding="{Binding ChangeState}" Value="30">
+                                <Setter Property="Text" Value="Задача ↓"/>
+                            </DataTrigger>
+                            <DataTrigger TargetType="Label" Binding="{Binding ChangeState}" Value="31">
+                                <Setter Property="Text" Value="Задача ↑"/>
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                    <Label Text="Cтатус" Grid.Column="3">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ChangeSortedTypeCommand}" CommandParameter="4"/>
+                        </Label.GestureRecognizers>
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label" Binding="{Binding ChangeState}" Value="40">
+                                <Setter Property="Text" Value="Cтатус ↓"/>
+                            </DataTrigger>
+                            <DataTrigger TargetType="Label" Binding="{Binding ChangeState}" Value="41">
+                                <Setter Property="Text" Value="Cтатус ↑"/>
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                </Grid>
+            </Frame>
+            <ListView Grid.Row="1" x:Name="listView" 
+              ItemsSource="{Binding Items}"
+                      Margin="0">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <Frame BackgroundColor="LightBlue" HasShadow="True" Margin="10">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped_1"/>
+                                </Frame.GestureRecognizers>
+                                <Grid ColumnSpacing="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="5*"/>
+                                        <ColumnDefinition Width="10*"/>
+                                        <ColumnDefinition Width="2*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Text="{Binding UserName}"  Grid.Column="0"
+                               VerticalTextAlignment="Center" />
+                                    <Label Text="{Binding Email}"  Grid.Column="1"
+                               VerticalTextAlignment="Center" />
+                                    <Label Text="{Binding Text}"  Grid.Column="2"
+                               VerticalTextAlignment="Center" />
+                                    <CheckBox Grid.Column="3"
+                               IsChecked="{Binding Status}" 
+                                              IsEnabled="False"/>
+                                </Grid>
+                            </Frame>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <StackLayout Grid.Row="2" HorizontalOptions="Center">
+                <Frame BackgroundColor="LightGreen">
+                    <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
+                        <Picker SelectedIndex="{Binding CurrentPage, Mode=TwoWay}" ItemsSource="{Binding PagesCheckList}"/>
+                        <Label Text="{Binding PagesCount, StringFormat=' / {0}'}" VerticalOptions="Center"/>
+                    </StackLayout>
+                </Frame>
+            </StackLayout>
+            <StackLayout Grid.Row="0" Grid.RowSpan="3" Opacity="0.5" HorizontalOptions="Fill" BackgroundColor="Black" IsVisible="{Binding AdminFormEnable}">
+                <StackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"/>
+                </StackLayout.GestureRecognizers>
+                <Frame HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" BackgroundColor="LightBlue" WidthRequest="300">
+                    <StackLayout>
+                        <Label Text="Autorization" HorizontalOptions="Center"/>
+                        <Entry Placeholder="Логин" Text="{Binding Login, Mode=TwoWay}"/>
+                        <Entry Placeholder="Пароль" Text="{Binding Password, Mode=TwoWay}" IsPassword="True"/>
+                        <Button Text="Войти" Command="{Binding LoginingCommand}"/>
+                    </StackLayout>
+                </Frame>
+            </StackLayout>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>
