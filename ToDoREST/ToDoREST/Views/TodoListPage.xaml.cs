@@ -16,7 +16,7 @@ namespace ToDoREST.Views
 		public ToDoListModelView viewModel { get; set; }
 		public TodoListPage()
 		{
-			viewModel = new ToDoListModelView();
+			viewModel = new ToDoListModelView(this);
 			BindingContext = viewModel;
 			InitializeComponent();
             Appearing += TodoListPage_Appearing;
@@ -45,13 +45,19 @@ namespace ToDoREST.Views
         {
 			viewModel.AdminFormEnable = false;
         }
-
-        private async void TapGestureRecognizer_Tapped_1(object sender, EventArgs e)
+		private void TapGestureRecognizer_Tapped3(object sender, EventArgs e)
+		{
+			if (!viewModel.IsAdmin)
+				viewModel.AdminFormEnable = true;
+			else
+				viewModel.UnLoging();
+		}
+		private async void TapGestureRecognizer_Tapped_1(object sender, EventArgs e)
         {
 			listView.SelectedItem = null;
-			if (App.IsAdmin)
+			if (viewModel.IsAdmin)
             {
-				var item = ((Frame)sender).BindingContext as ToDoItemModelView;
+				var item = ((Grid)sender).BindingContext as ToDoItemModelView;
 				item.IsNew = false;
 				await Navigation.PushAsync(new TodoItemPage
 				{

@@ -8,6 +8,17 @@ namespace ToDoREST.ViewModels
 {
     public class ToDoItemModelView : INotifyPropertyChanged
     {
+        bool edited;
+        public bool Edited { get => edited;
+            set
+            {
+                if(edited != value)
+                {
+                    edited = value;
+                    OnPropertyChanged(nameof(Edited));
+                }
+            }
+        }
         public bool IsAdmin { get => App.IsAdmin; }
         bool isNew;
         public bool IsNew { get => isNew;

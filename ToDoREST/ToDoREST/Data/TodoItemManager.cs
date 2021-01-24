@@ -21,7 +21,7 @@ namespace ToDoREST.Data
 			return restService.RefreshDataAsync(page, sortedField, sortDirection);
 		}
 
-		public Task SaveTaskAsync(TodoItem item, bool isNewItem = false)
+		public Task<bool> SaveTaskAsync(TodoItem item, bool isNewItem = false)
 		{
 			return restService.SaveTodoItemAsync(item, isNewItem);
 		}
@@ -29,6 +29,10 @@ namespace ToDoREST.Data
 		public Task<bool> Logining(string login, string password)
         {
 			return restService.Logining(login, password);
+        }
+		public Task<bool> UpdateTodoItemAsync(TodoItem item)
+        {
+			return restService.UpdateTodoItemAsync(item);
         }
 	}
 }

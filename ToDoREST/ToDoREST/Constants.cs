@@ -10,7 +10,7 @@ namespace ToDoREST
         public enum SortedField { id, username, email, status }
         public enum SortDirection { asc, desc }
         // URL of REST service
-        public static string developer = "?developer=Andi";
+        public static string developer = "?developer=NewAndi1";
         public static string Url = "https://uxcandy.com/~shapoval/test-task-backend/v2/";
         public static string StartUrl = Url + developer;
         public static string GetTasks(int page, SortedField sortedField, SortDirection sortDirection)
@@ -19,6 +19,10 @@ namespace ToDoREST
         }
         public static string AddTask = Url + "create" + developer;
         public static string Login = Url + "login" + developer;
+        public static string UpdateTask(int id)
+        {
+            return Url + "edit/:" + id + developer;
+        }
 
     }
 }

@@ -14,7 +14,6 @@ namespace ToDoREST.Data
 {
     public class RestService : IRestService
     {
-        string Token { get; set; }
         HttpClient client;
         public static int _TimeoutSec = 30;
         public static string ServerLink = "https://blauberg-group-cloud.com/BL_Universal/";
@@ -46,7 +45,10 @@ namespace ToDoREST.Data
                     string content = await response.Content.ReadAsStringAsync();
                     var message = JsonConvert.DeserializeObject<JSONResponse>(content).message;
                     Items = message.tasks;
-                    pagesCount = message.total_task_count / 3;
+                    if (message.total_task_count % 3 == 0)
+                        pagesCount = (message.total_task_count / 3);
+                    else
+                        pagesCount = (message.total_task_count / 3) + 1;
                 }
             }
             catch (Exception ex)
@@ -57,7 +59,7 @@ namespace ToDoREST.Data
             return (pagesCount, Items);
         }
 
-        public async Task SaveTodoItemAsync(TodoItem item, bool isNewItem = false)
+        public async Task<bool> SaveTodoItemAsync(TodoItem item, bool isNewItem = false)
         {
             var nvc = new List<KeyValuePair<string, string>>();
             nvc.Add(new KeyValuePair<string, string>("username", item.username));
@@ -68,30 +70,56 @@ namespace ToDoREST.Data
                 var req = new HttpRequestMessage(HttpMethod.Post, Constants.AddTask) { Content = new FormUrlEncodedContent(nvc) };
                 var res = client.SendAsync(req);
                 status = await res.Result.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<AddItemResponse>(status).status;
+                return result == "Ok";
             }
             catch (Exception ex)
             {
                 status = ex.Message;
+                return false;
             }
         }
-        public async Task UpdateTodoItemAsync(TodoItem item)
+        public async Task<bool> UpdateTodoItemAsync(TodoItem item)
         {
             var nvc = new List<KeyValuePair<string, string>>();
+            nvc.Add(new KeyValuePair<string, string>("token", ((Token)App.Current.Properties["newtoken"]).token));
             nvc.Add(new KeyValuePair<string, string>("text", item.text));
             nvc.Add(new KeyValuePair<string, string>("status", item.status?"10":"0"));
             try
             {
-                var req = new HttpRequestMessage(HttpMethod.Post, Constants.AddTask) { Content = new FormUrlEncodedContent(nvc) };
+                var req = new HttpRequestMessage(HttpMethod.Post, Constants.UpdateTask(item.id)) { Content = new FormUrlEncodedContent(nvc) };
                 var res = client.SendAsync(req);
                 status = await res.Result.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<AddItemResponse>(status).status;
+                return result == "Ok";
             }
             catch (Exception ex)
             {
                 status = ex.Message;
+                return false;
             }
+        }
+        public class Token
+        {
+            public string token { get; set; }
+            public DateTime Time { get; set; }
+            public bool IsOut { get; set; }
         }
         public async Task<bool> Logining(string login, string password)
         {
+            if (App.Current.Properties.TryGetValue("newtoken", out object newToken))
+            {
+                if (!((Token)newToken).IsOut)
+                {
+                    var currentToken = (Token)newToken;
+                    int year = DateTime.Now.Year - currentToken.Time.Year;
+                    int month = DateTime.Now.Month - currentToken.Time.Month;
+                    int day = DateTime.Now.Day - currentToken.Time.Day;
+                    int hour = DateTime.Now.Hour - currentToken.Time.Hour;
+                    if (year == 0 && month == 0 && day == 0 && hour < 23)
+                        return true;
+                }
+            }
             var nvc = new List<KeyValuePair<string, string>>();
             nvc.Add(new KeyValuePair<string, string>("username", login));
             nvc.Add(new KeyValuePair<string, string>("password", password));
@@ -104,7 +132,9 @@ namespace ToDoREST.Data
                 var response = JsonConvert.DeserializeObject<AdminResponse>(status);
                 if (response.status == "ok")
                 {
-                    Token = response.message.token;
+                    App.Current.Properties["newtoken"] = new Token { token = response.message.token, Time = DateTime.Now, IsOut = false  };
+                    App.Current.Properties["username"] = login;
+                    App.Current.Properties["password"] = password;
                     return true;
                 }
                 else
