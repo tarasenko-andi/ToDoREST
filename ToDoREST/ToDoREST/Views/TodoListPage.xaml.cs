@@ -39,7 +39,7 @@ namespace ToDoREST.Views
 
 		}
 
-		async void OnItemSelected(object sender, SelectedItemChangedEventArgs e)
+		void OnItemSelected(object sender, SelectedItemChangedEventArgs e)
 		{
 			listView.SelectedItem = null;
 		}

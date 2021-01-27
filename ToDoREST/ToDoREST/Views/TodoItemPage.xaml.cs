@@ -74,7 +74,7 @@ namespace ToDoREST.Views
             {
 				str += "Поле Задачи не заполнено";
 			}
-			return false;
+			return str == "";
         }
 
         async void OnCancelButtonClicked(object sender, EventArgs e)
