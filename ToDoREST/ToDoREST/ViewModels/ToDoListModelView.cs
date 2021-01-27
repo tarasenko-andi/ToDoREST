@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ToDoREST.Models;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 using static ToDoREST.Constants;
 using static ToDoREST.Data.RestService;
@@ -43,12 +44,8 @@ namespace ToDoREST.ViewModels
         {
             CallPage = page;
             LoginingCommand = new Command(async() => await Logining());
-            ChangeSortedTypeCommand = new Command((object type) => ChangeSortedType(type));
+            ChangeSortedTypeCommand = new Command(async(object type) => await ChangeSortedTypeAsync(type));
             Items = new List<ToDoItemModelView>();
-            CurrentSortedField = SortedField.username;
-            CurrentPage = 1;
-            PagesCheckList = new List<int>() { CurrentPage };
-            Task.Run(() => UpdateItemsAsync());
             App.UpdateIsAdmin += App_UpdateIsAdmin;
             SavedList = new List<ToDoItemModelView>();
         }
@@ -56,12 +53,11 @@ namespace ToDoREST.ViewModels
         internal void UnLoging()
         {
             App.IsAdmin = false;
-            if (App.Current.Properties.TryGetValue("username", out object user))
-                App.Current.Properties["username"] = "";
-            if (App.Current.Properties.TryGetValue("password", out object password))
-                App.Current.Properties["password"] = "";
-            if (App.Current.Properties.TryGetValue("newtoken", out object token))
-                App.Current.Properties["newtoken"] = new Token() { IsOut = true };
+            Preferences.Remove("login");
+            Preferences.Remove("password");
+            Preferences.Remove("token");
+            Preferences.Set("isout", true);
+            Preferences.Remove("datetimetoken");
         }
 
         private void App_UpdateIsAdmin(bool state)
@@ -135,7 +131,7 @@ namespace ToDoREST.ViewModels
             return valid;
         }
 
-        int pagesCount;
+        int pagesCount = 1;
         public int PagesCount { get => pagesCount;
             set
             {
@@ -156,16 +152,20 @@ namespace ToDoREST.ViewModels
                 newList.Add(i);
             }
             PagesCheckList = newList;
+            int curPg = currentPage;
+            currentPage = 0;
+            CurrentPage = curPg;
         }
 
-        private void ChangeSortedType(object type)
+        public async Task ChangeSortedTypeAsync(object type)
         {
             var sortedField = ((SortedField)Int32.Parse((string)type));
-            if (sortedField == CurrentSortedField)
-                CurrentSortDirection = CurrentSortDirection == SortDirection.asc ? SortDirection.desc : SortDirection.asc;
-            else
+            if (sortedField != CurrentSortedField)
                 CurrentSortedField = sortedField;
+            else
+                CurrentSortDirection = CurrentSortDirection == SortDirection.asc ? SortDirection.desc : SortDirection.asc;
             ChangeState = Int32.Parse(((int)CurrentSortedField).ToString() + ((int)CurrentSortDirection).ToString());
+            await UpdateItemsAsync();
         }
         int changeState;
         public int ChangeState { get => changeState;
@@ -179,7 +179,7 @@ namespace ToDoREST.ViewModels
             }
         }
         public ICommand ChangeSortedTypeCommand { get; set; }
-        int currentPage;
+        int currentPage = 1;
         public int CurrentPage
         {
             get => currentPage;
@@ -193,7 +193,7 @@ namespace ToDoREST.ViewModels
                 }
             }
         }
-        SortedField sortedField;
+        SortedField sortedField = SortedField.username;
         public SortedField CurrentSortedField { get => sortedField;
             set
             {
@@ -201,7 +201,6 @@ namespace ToDoREST.ViewModels
                 {
                     sortedField = value;
                     OnPropertyChanged(nameof(this.CurrentSortedField));
-                    Task.Run(() => UpdateItemsAsync());
                 }
             }
         }
@@ -215,7 +214,6 @@ namespace ToDoREST.ViewModels
                 {
                     sortDirection = value;
                     OnPropertyChanged(nameof(this.CurrentSortDirection));
-                    Task.Run(() => UpdateItemsAsync());
                 }
             }
         }
@@ -231,31 +229,25 @@ namespace ToDoREST.ViewModels
             }
         }
         List<ToDoItemModelView> SavedList { get; set; }
-        bool isBussy;
         public async Task UpdateItemsAsync()
         {
-            if (!isBussy)
+            (int pCount, List<TodoItem> todoItems) = await App.TodoManager.GetTasksAsync(CurrentPage, CurrentSortedField, CurrentSortDirection);
+            var newItems = new List<ToDoItemModelView>();
+            foreach (var item in todoItems)
             {
-                isBussy = true;
-                (int pCount, List<TodoItem> todoItems) = await App.TodoManager.GetTasksAsync(CurrentPage, CurrentSortedField, CurrentSortDirection);
-                var newItems = new List<ToDoItemModelView>();
-                foreach (var item in todoItems)
+                if (Items.FirstOrDefault(x => x.ID == item.id) == null)
                 {
-                    if(Items.FirstOrDefault(x=>x.ID == item.id) == null)
-                    {
-                        var newItem = new ToDoItemModelView(item);
-                        newItems.Add(newItem);
-                        SavedList.Add(newItem);
-                    }
-                    else
-                    {
-                        newItems.Add(SavedList.FirstOrDefault(x => x.ID == item.id));
-                    }
+                    var newItem = new ToDoItemModelView(item);
+                    newItems.Add(newItem);
+                    SavedList.Add(newItem);
                 }
-                Items = newItems;
-                PagesCount = pCount;
-                isBussy = false;
+                else
+                {
+                    newItems.Add(SavedList.FirstOrDefault(x => x.ID == item.id));
+                }
             }
+            Items = newItems;
+            PagesCount = pCount;
         }
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string propName)

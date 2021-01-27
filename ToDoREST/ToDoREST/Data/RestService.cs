@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using ToDoREST.Models;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 using static ToDoREST.Constants;
 
@@ -107,15 +108,17 @@ namespace ToDoREST.Data
         }
         public async Task<bool> Logining(string login, string password)
         {
-            if (App.Current.Properties.TryGetValue("newtoken", out object newToken))
+            DateTime datetimetoken = Preferences.Get("datetimetoken", default(DateTime));
+            string token = Preferences.Get("token", "");
+            bool isout = Preferences.Get("isout", false);
+            if (token != "")
             {
-                if (!((Token)newToken).IsOut)
+                if (!isout)
                 {
-                    var currentToken = (Token)newToken;
-                    int year = DateTime.Now.Year - currentToken.Time.Year;
-                    int month = DateTime.Now.Month - currentToken.Time.Month;
-                    int day = DateTime.Now.Day - currentToken.Time.Day;
-                    int hour = DateTime.Now.Hour - currentToken.Time.Hour;
+                    int year = DateTime.Now.Year - datetimetoken.Year;
+                    int month = DateTime.Now.Month - datetimetoken.Month;
+                    int day = DateTime.Now.Day - datetimetoken.Day;
+                    int hour = DateTime.Now.Hour - datetimetoken.Hour;
                     if (year == 0 && month == 0 && day == 0 && hour < 23)
                         return true;
                 }
@@ -132,9 +135,11 @@ namespace ToDoREST.Data
                 var response = JsonConvert.DeserializeObject<AdminResponse>(status);
                 if (response.status == "ok")
                 {
-                    App.Current.Properties["newtoken"] = new Token { token = response.message.token, Time = DateTime.Now, IsOut = false  };
-                    App.Current.Properties["username"] = login;
-                    App.Current.Properties["password"] = password;
+                    Preferences.Set("token", response.message.token);
+                    Preferences.Set("isout", false);
+                    Preferences.Set("datetimetoken", DateTime.Now);
+                    Preferences.Set("username", login);
+                    Preferences.Set("password", password);
                     return true;
                 }
                 else

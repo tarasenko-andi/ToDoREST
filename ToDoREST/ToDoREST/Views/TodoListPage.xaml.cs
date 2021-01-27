@@ -18,8 +18,11 @@ namespace ToDoREST.Views
 		{
 			viewModel = new ToDoListModelView(this);
 			BindingContext = viewModel;
+			viewModel.ChangeSortedTypeAsync(viewModel.CurrentSortedField);
+			Appearing += TodoListPage_Appearing;
+			viewModel.PagesCheckList = new List<int>() { viewModel.CurrentPage };
 			InitializeComponent();
-            Appearing += TodoListPage_Appearing;
+			viewModel.ChangeState = 10;
 		}
 
         private void TodoListPage_Appearing(object sender, EventArgs e)

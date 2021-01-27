@@ -53,8 +53,8 @@ namespace ToDoREST.Views
             }
             else
             {
-				await App.TodoManager.UpdateTodoItemAsync(todoItem.TodoItem);
 				todoItem.Edited = todoItem.Text != startedItem.Text;
+				await App.TodoManager.UpdateTodoItemAsync(todoItem.TodoItem);
 			}
 			await Navigation.PopAsync();
 		}

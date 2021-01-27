@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ToDoREST.Data;
 using ToDoREST.Views;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -28,8 +29,10 @@ namespace ToDoREST
         {
             TodoManager = new TodoItemManager(new RestService());
             MainPage = new NavigationPage(new TodoListPage());
-            if (App.Current.Properties.TryGetValue("username", out object user) && App.Current.Properties.TryGetValue("password", out object password))
-                Task.Run(() => App.IsAdmin = TodoManager.Logining((string)user, (string)password).Result);
+            string username = Preferences.Get("username", "noUser");
+            string password = Preferences.Get("password", "noPassword");
+            if (username != "noUser" && password != "noPassword")
+                Task.Run(() => App.IsAdmin = TodoManager.Logining(username, password).Result);
         }
 
         protected override void OnStart()

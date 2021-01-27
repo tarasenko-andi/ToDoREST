@@ -12,6 +12,11 @@
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
     </ContentPage.ToolbarItems>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <constans:ConverterState x:Key="stateConverter"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
     <ContentPage.Content>
         <Grid>
             <Grid.RowDefinitions>
@@ -24,7 +29,7 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="4*"/>
                     <ColumnDefinition Width="5*"/>
                     <ColumnDefinition Width="10*"/>
                     <ColumnDefinition Width="4*"/>
@@ -35,11 +40,14 @@
                         <TapGestureRecognizer Command="{Binding ChangeSortedTypeCommand}" CommandParameter="1"/>
                     </Label.GestureRecognizers>
                     <Label.Triggers>
-                        <DataTrigger TargetType="Label" Binding="{Binding ChangeState}" Value="10">
+                        <DataTrigger TargetType="Label" Binding="{Binding ChangeState, Converter={StaticResource stateConverter}, ConverterParameter=1}" Value="10">
                             <Setter Property="Text" Value="Имья ↓"/>
                         </DataTrigger>
-                        <DataTrigger TargetType="Label" Binding="{Binding ChangeState}" Value="11">
+                        <DataTrigger TargetType="Label" Binding="{Binding ChangeState, Converter={StaticResource stateConverter}, ConverterParameter=1}" Value="11">
                             <Setter Property="Text" Value="Имья ↑"/>
+                        </DataTrigger>
+                        <DataTrigger TargetType="Label" Binding="{Binding ChangeState, Converter={StaticResource stateConverter}, ConverterParameter=1}" Value="0">
+                            <Setter Property="Text" Value="Имья"/>
                         </DataTrigger>
                     </Label.Triggers>
                 </Label>
@@ -48,11 +56,14 @@
                         <TapGestureRecognizer Command="{Binding ChangeSortedTypeCommand}" CommandParameter="2"/>
                     </Label.GestureRecognizers>
                     <Label.Triggers>
-                        <DataTrigger TargetType="Label" Binding="{Binding ChangeState}" Value="20">
+                        <DataTrigger TargetType="Label" Binding="{Binding ChangeState, Converter={StaticResource stateConverter}, ConverterParameter=2}" Value="20">
                             <Setter Property="Text" Value="E-mail ↓"/>
                         </DataTrigger>
-                        <DataTrigger TargetType="Label" Binding="{Binding ChangeState}" Value="21">
+                        <DataTrigger TargetType="Label" Binding="{Binding ChangeState, Converter={StaticResource stateConverter}, ConverterParameter=2}" Value="21">
                             <Setter Property="Text" Value="E-mail ↑"/>
+                        </DataTrigger>
+                        <DataTrigger TargetType="Label" Binding="{Binding ChangeState, Converter={StaticResource stateConverter}, ConverterParameter=2}" Value="0">
+                            <Setter Property="Text" Value="E-mail"/>
                         </DataTrigger>
                     </Label.Triggers>
                 </Label>
@@ -62,11 +73,14 @@
                         <TapGestureRecognizer Command="{Binding ChangeSortedTypeCommand}" CommandParameter="3"/>
                     </Label.GestureRecognizers>
                     <Label.Triggers>
-                        <DataTrigger TargetType="Label" Binding="{Binding ChangeState}" Value="30">
+                        <DataTrigger TargetType="Label" Binding="{Binding ChangeState, Converter={StaticResource stateConverter}, ConverterParameter=3}" Value="30">
                             <Setter Property="Text" Value="Cтатус ↓"/>
                         </DataTrigger>
-                        <DataTrigger TargetType="Label" Binding="{Binding ChangeState}" Value="31">
+                        <DataTrigger TargetType="Label" Binding="{Binding ChangeState, Converter={StaticResource stateConverter}, ConverterParameter=3}" Value="31">
                             <Setter Property="Text" Value="Cтатус ↑"/>
+                        </DataTrigger>
+                        <DataTrigger TargetType="Label" Binding="{Binding ChangeState, Converter={StaticResource stateConverter}, ConverterParameter=3}" Value="0">
+                            <Setter Property="Text" Value="Cтатус"/>
                         </DataTrigger>
                     </Label.Triggers>
                 </Label>
@@ -113,7 +127,7 @@
             <StackLayout Grid.Row="2" HorizontalOptions="CenterAndExpand" Orientation="Horizontal">
                 <Frame BackgroundColor="LightGreen">
                     <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
-                        <Picker ItemsSource="{Binding PagesCheckList}" SelectedItem="{Binding CurrentPage, Mode=TwoWay}"/>
+                        <Picker ItemsSource="{Binding PagesCheckList}" SelectedItem="{Binding CurrentPage, Mode=TwoWay}" x:Name="pagePicker"/>
                         <Label Text="{Binding PagesCount, StringFormat=' / {0}'}" VerticalOptions="Center"/>
                     </StackLayout>
                 </Frame>
