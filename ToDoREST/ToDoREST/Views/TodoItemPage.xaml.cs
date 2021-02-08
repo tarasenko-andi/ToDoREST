@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ToDoREST.Models;
+using ToDoREST.State;
 using ToDoREST.ViewModels;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -53,7 +54,7 @@ namespace ToDoREST.Views
             }
             else
             {
-				todoItem.Edited = todoItem.Text != startedItem.Text;
+				ToDoItemModelView.ChangeStatus(todoItem, todoItem.Text != startedItem.Text , todoItem.Execute);
 				await App.TodoManager.UpdateTodoItemAsync(todoItem.TodoItem);
 			}
 			await Navigation.PopAsync();
@@ -74,7 +75,7 @@ namespace ToDoREST.Views
             {
 				str += "Поле Задачи не заполнено";
 			}
-			return str == "";
+			return str != "";
         }
 
         async void OnCancelButtonClicked(object sender, EventArgs e)

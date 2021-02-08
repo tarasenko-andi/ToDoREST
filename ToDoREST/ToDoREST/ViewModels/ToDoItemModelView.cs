@@ -1,21 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
-using ToDoREST.Models;
+﻿using System.ComponentModel;
+using ToDoREST.State;
 
 namespace ToDoREST.ViewModels
 {
     public class ToDoItemModelView : INotifyPropertyChanged
     {
-        bool edited;
-        public bool Edited { get => edited;
+        
+        bool execute;
+        public bool Execute
+        {
+            get => execute;
             set
             {
-                if(edited != value)
+                if (execute != value)
                 {
-                    edited = value;
-                    OnPropertyChanged(nameof(Edited));
+                    execute = value;
+                    OnPropertyChanged(nameof(Execute));
                 }
             }
         }
@@ -74,7 +74,7 @@ namespace ToDoREST.ViewModels
                 }
             }
         }
-        public bool Status
+        public Status Status
         {
             get => TodoItem.status;
             set
@@ -97,6 +97,17 @@ namespace ToDoREST.ViewModels
                     OnPropertyChanged(nameof(Text));
                 }
             }
+        }
+        public static void ChangeStatus(ToDoItemModelView item, bool editAdmin, bool execute)
+        {
+            if (!editAdmin && !execute)
+                item.Status = Status.NoExecute;
+            else if (editAdmin && !execute)
+                item.Status = Status.NoExecuteAndAdminCheck;
+            else if (!editAdmin && execute)
+                item.Status = Status.Execute;
+            else if (editAdmin && execute)
+                item.Status = Status.ExecuteAndAdminCheck;
         }
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string propName)

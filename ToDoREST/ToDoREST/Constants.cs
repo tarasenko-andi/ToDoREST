@@ -21,7 +21,7 @@ namespace ToDoREST
         public static string Login = Url + "login" + developer;
         public static string UpdateTask(int id)
         {
-            return Url + "edit/:" + id + developer;
+            return Url + "edit/" + id + developer;
         }
 
     }

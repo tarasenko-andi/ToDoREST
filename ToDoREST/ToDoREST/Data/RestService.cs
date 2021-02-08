@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using ToDoREST.Models;
+using ToDoREST.State;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using static ToDoREST.Constants;
@@ -18,7 +19,7 @@ namespace ToDoREST.Data
         HttpClient client;
         public static int _TimeoutSec = 30;
         public static string ServerLink = "https://blauberg-group-cloud.com/BL_Universal/";
-        public static string _ContentType = "application/x-www-form-urlencoded";
+        public static string _ContentType = "multipart/form-data";
         public static string _UserAgent = "d-fens HttpClient";
         public static string status = "no determinate";//начальный статус
 
@@ -83,12 +84,13 @@ namespace ToDoREST.Data
         public async Task<bool> UpdateTodoItemAsync(TodoItem item)
         {
             var nvc = new List<KeyValuePair<string, string>>();
-            nvc.Add(new KeyValuePair<string, string>("token", ((Token)App.Current.Properties["newtoken"]).token));
+            nvc.Add(new KeyValuePair<string, string>("token", Preferences.Get("token", "")));
             nvc.Add(new KeyValuePair<string, string>("text", item.text));
-            nvc.Add(new KeyValuePair<string, string>("status", item.status?"10":"0"));
+            nvc.Add(new KeyValuePair<string, string>("status", ((int)(item.status)).ToString()));
             try
             {
-                var req = new HttpRequestMessage(HttpMethod.Post, Constants.UpdateTask(item.id)) { Content = new FormUrlEncodedContent(nvc) };
+                string url = Constants.UpdateTask(item.id);
+                var req = new HttpRequestMessage(HttpMethod.Post, url) { Content = new FormUrlEncodedContent(nvc) };
                 var res = client.SendAsync(req);
                 status = await res.Result.Content.ReadAsStringAsync();
                 var result = JsonConvert.DeserializeObject<AddItemResponse>(status).status;

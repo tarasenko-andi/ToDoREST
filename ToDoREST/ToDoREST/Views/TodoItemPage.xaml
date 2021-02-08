@@ -15,7 +15,7 @@
         <Entry Text="{Binding Text, Mode=TwoWay}"
                Placeholder="Enter notes"/>
         <Label Text="Done" />
-        <Switch IsToggled="{Binding Status, Mode=TwoWay}" IsEnabled="{Binding IsAdmin}" />
+        <Switch IsToggled="{Binding Execute, Mode=TwoWay}" IsEnabled="{Binding IsAdmin}" />
         <Button Text="Save" 
                 Clicked="OnSaveButtonClicked" />
         <Button Text="Cancel" 
