@@ -15,6 +15,7 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <constans:ConverterState x:Key="stateConverter"/>
+            <constans:StatusConverter x:Key="statusConverter"/>
         </ResourceDictionary>
     </ContentPage.Resources>
     <ContentPage.Content>
@@ -111,26 +112,8 @@
                                VerticalTextAlignment="Center"  HorizontalOptions="Start"/>
                                 <Label Text="{Binding Text}"  Grid.Column="2"
                                VerticalTextAlignment="Center"  HorizontalOptions="Start"/>
-                                <CheckBox Grid.Column="3" IsEnabled="False" HorizontalOptions="Center">
-                                    <CheckBox.Triggers>
-                                        <DataTrigger TargetType="CheckBox" Binding="{Binding Status}" Value="0">
-                                            <Setter Property="IsChecked" Value="False"/>
-                                        </DataTrigger>
-                                        <DataTrigger TargetType="CheckBox" Binding="{Binding Status}" Value="10">
-                                            <Setter Property="IsChecked" Value="True"/>
-                                        </DataTrigger>
-                                    </CheckBox.Triggers>
-                                </CheckBox>
-                                <CheckBox Grid.Column="4" IsChecked="{Binding Edited}"  IsEnabled="False" HorizontalOptions="Center">
-                                    <CheckBox.Triggers>
-                                        <DataTrigger TargetType="CheckBox" Binding="{Binding Status}" Value="1">
-                                            <Setter Property="IsChecked" Value="False"/>
-                                        </DataTrigger>
-                                        <DataTrigger TargetType="CheckBox" Binding="{Binding Status}" Value="11">
-                                            <Setter Property="IsChecked" Value="True"/>
-                                        </DataTrigger>
-                                    </CheckBox.Triggers>
-                                </CheckBox>
+                                <CheckBox Grid.Column="3" IsChecked="{Binding Status, Converter={StaticResource statusConverter}, ConverterParameter=Execute}" IsEnabled="False" HorizontalOptions="Center"/>
+                                <CheckBox Grid.Column="4" IsChecked="{Binding Status, Converter={StaticResource statusConverter}, ConverterParameter=AdminEdit}" IsEnabled="False" HorizontalOptions="Center"/>
                             </Grid>
                         </ViewCell>
                     </DataTemplate>

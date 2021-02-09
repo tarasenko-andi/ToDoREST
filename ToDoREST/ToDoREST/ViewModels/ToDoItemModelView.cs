@@ -5,20 +5,6 @@ namespace ToDoREST.ViewModels
 {
     public class ToDoItemModelView : INotifyPropertyChanged
     {
-        
-        bool execute;
-        public bool Execute
-        {
-            get => execute;
-            set
-            {
-                if (execute != value)
-                {
-                    execute = value;
-                    OnPropertyChanged(nameof(Execute));
-                }
-            }
-        }
         public bool IsAdmin { get => App.IsAdmin; }
         bool isNew;
         public bool IsNew { get => isNew;
@@ -104,9 +90,9 @@ namespace ToDoREST.ViewModels
                 item.Status = Status.NoExecute;
             else if (editAdmin && !execute)
                 item.Status = Status.NoExecuteAndAdminCheck;
-            else if (!editAdmin && execute)
+            else if (!editAdmin && (execute||item.Status == Status.Execute))
                 item.Status = Status.Execute;
-            else if (editAdmin && execute)
+            else if (editAdmin && (execute||item.Status == Status.ExecuteAndAdminCheck))
                 item.Status = Status.ExecuteAndAdminCheck;
         }
         public event PropertyChangedEventHandler PropertyChanged;

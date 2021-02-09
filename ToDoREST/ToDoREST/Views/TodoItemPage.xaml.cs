@@ -21,6 +21,8 @@ namespace ToDoREST.Views
 		{
 			InitializeComponent();
 			isNewItem = isNew;
+			if (isNew)
+				IsExecute_Switch.IsVisible = false;
             BindingContextChanged += TodoItemPage_BindingContextChanged;
 		}
 		bool updateContext;
@@ -47,14 +49,17 @@ namespace ToDoREST.Views
 				if (await App.TodoManager.SaveTaskAsync(todoItem.TodoItem, isNewItem))
 				{
 					await DisplayAlert("Успешно", "Сохранение данных прошло успешно", "ОК");
+				}
+                else
+                {
+					await DisplayAlert("Ошибка", "Ошибка сохранения данных", "ОК");
 					return;
 				}
-				else
-					await DisplayAlert("Ошибка", "Ошибка сохранения данных", "ОК");
+
             }
             else
             {
-				ToDoItemModelView.ChangeStatus(todoItem, todoItem.Text != startedItem.Text , todoItem.Execute);
+				ToDoItemModelView.ChangeStatus(todoItem, todoItem.Text != startedItem.Text, IsExecute_Switch.IsToggled);
 				await App.TodoManager.UpdateTodoItemAsync(todoItem.TodoItem);
 			}
 			await Navigation.PopAsync();
@@ -82,5 +87,5 @@ namespace ToDoREST.Views
 		{
 			await Navigation.PopAsync();
 		}
-	}
+    }
 }

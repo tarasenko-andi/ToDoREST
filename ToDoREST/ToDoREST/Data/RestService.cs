@@ -73,7 +73,7 @@ namespace ToDoREST.Data
                 var res = client.SendAsync(req);
                 status = await res.Result.Content.ReadAsStringAsync();
                 var result = JsonConvert.DeserializeObject<AddItemResponse>(status).status;
-                return result == "Ok";
+                return result == "ok";
             }
             catch (Exception ex)
             {
